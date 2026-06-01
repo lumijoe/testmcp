@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>事故費用精算</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      padding: 32px 24px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #1a1a2e;
+    }
+
+    /* ── タブ ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 0;
+    }
+    .tab-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px 8px 0 0;
+      background: #dde1e9;
+      color: #666;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .tab-btn.active {
+      background: #fff;
+      color: #1a1a2e;
+      font-weight: 700;
+    }
+
+    /* ── パネル ── */
+    .panel {
+      display: none;
+      background: #fff;
+      border-radius: 0 8px 8px 8px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .panel.active { display: block; }
+
+    /* ── テーブル共通 ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      background: #1e3a8a;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #eef0f4;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f7f8fc; }
+
+    /* ── 項番バッジ ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #e8edf8;
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    /* ── 金額 ── */
+    .amount { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .amount.plus  { color: #16a34a; font-weight: 700; }
+    .amount.minus { color: #dc2626; }
+    .unit { color: #888; font-size: 11px; margin-left: 2px; }
+
+    /* ── 合計行 ── */
+    .total-row td {
+      background: #1e3a8a;
+      color: #fff;
+      font-weight: 700;
+      border-bottom: none;
+    }
+    .total-row .amount { color: #fbbf24; font-size: 15px; }
+
+    /* ── 未定バッジ ── */
+    .tag-pending {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .tag-included {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #e0e7ff;
+      color: #3730a3;
+      font-size: 11px;
+    }
+
+    /* ── 注記ブロック ── */
+    .note-block {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #fff7ed;
+      border-left: 4px solid #f97316;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .note-block p { font-weight: 700; margin-bottom: 8px; color: #c2410c; }
+    .note-block li { margin-left: 16px; color: #57534e; }
+
+    /* ── セクション見出し（タブ2・3） ── */
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      background: #334155;
+      padding: 6px 12px;
+    }
+    .section-spacer { height: 16px; }
+
+    /* ── 証跡タブ ── */
+    .ref-group-header td {
+      background: #e8edf8;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+
+<h1>事故費用精算書</h1>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('tab1', this)">① 請求明細</button>
+  <button class="tab-btn" onclick="switchTab('tab2', this)">② 封筒別収支</button>
+  <button class="tab-btn" onclick="switchTab('tab3', this)">③ 証跡突合</button>
+</div>
+
+<!-- ── タブ1：請求明細 ── -->
+<div id="tab1" class="panel active">
+  <table>
+    <thead>
+      <tr>
+        <th>項番</th>
+        <th>支払日</th>
+        <th style="text-align:left;">対象</th>
+        <th>金額</th>
+        <th style="text-align:left;">金額根拠</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:center;"><span class="badge">①</span></td>
+        <td style="text-align:center;"><span class="tag-pending">これから</span></td>
+        <td>自転車本体</td>
+        <td class="amount">85,800 <span class="unit">円</span></td>
+        <td>提出済：見積書 75,600円／115,200円と入荷状況・購入可能車を鑑みた結果</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="badge">②</span></td>
+        <td style="text-align:center;"><span class="tag-pending">これから</span></td>
+        <td>防犯登録</td>
+        <td class="amount">800 <span class="unit">円</span></td>
+        <td>提出済：見積書 75,600円／115,200円と入荷状況・購入可能車を鑑みた結果</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="badge">③</span></td>
+        <td style="text-align:center;">2026/02/22</td>
+        <td>楽天カーシェア</td>
+        <td class="amount">3,640 <span class="unit">円</span></td>
+        <td>添付：請求書（ガソリン込）</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="badge">④</span></td>
+        <td style="text-align:center;">2026/02/23</td>
+        <td>ニコニコレンタカー：車</td>
+        <td class="amount">7,810 <span class="unit">円</span></td>
+        <td>添付：納品書（領収書）</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="badge">⑤</span></td>
+        <td style="text-align:center;">2026/02/23</td>
+        <td>ニコニコレンタカー：ガソリン代</td>
+        <td class="amount">523 <span class="unit">円</span></td>
+        <td>添付：納品書（領収書）</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="badge">⑥</span></td>
+        <td style="text-align:center;">2026/02/24</td>
+        <td>えすみリウマチ整形外科クリニック</td>
+        <td class="amount">11,390 <span class="unit">円</span></td>
+        <td>添付：医療費請求書（領収書）</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="badge">⑦</span></td>
+        <td style="text-align:center;">2026/02/24</td>
+        <td>えすみリウマチ整形外科クリニック</td>
+        <td class="amount"><span class="tag-included">含む</span></td>
+        <td>添付：診断書</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="badge">⑧</span></td>
+        <td style="text-align:center;">2026/03/04</td>
+        <td>見積書店頭受け取り往復電車賃</td>
+        <td class="amount">480 <span class="unit">円</span></td>
+        <td>サイクルベースあさひ東住吉今川店（天王寺–駒川中野：谷町線）</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="badge">⑨</span></td>
+        <td style="text-align:center;"><span class="tag-pending">これから</span></td>
+        <td>レンタカー会社未定</td>
+        <td class="amount">5,000 <span class="unit">円</span></td>
+        <td>概算</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="3" style="text-align:right;">合計　①〜⑨</td>
+        <td class="amount">115,443 <span class="unit" style="color:#fde68a;">円</span></td>
+        <td>振込手数料はご負担ください</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="note-block">
+    <p>上記、3日以内に振込いただける場合、以下はこちらで負担・ケアを継続させていただく所存です。</p>
+    <ul>
+      <li>急な現金引き出しの銀行手数料や家計への一時的な精神的負担</li>
+      <li>業務時間内や休憩時間内に連絡するための時間的・精神的負担</li>
+      <li>息子の事故恐怖と放置され逃げられた精神的負担</li>
+      <li>日本損害保険への相談を余儀なくされた精神的負担と電話代</li>
+      <li>日本損害保険からのアンケート回答への精神的・時間的負担</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ── タブ2：封筒別収支 ── -->
+<div id="tab2" class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align:left;">封筒／口座</th>
+        <th>日付</th>
+        <th style="text-align:left;">内容</th>
+        <th>金額</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="section-title" colspan="4">郵貯事故対応袋</td></tr>
+      <tr><td></td><td style="text-align:center;">2/22</td><td>SUBARU口座から引き出し</td><td class="amount minus">−20,000</td></tr>
+      <tr><td></td><td style="text-align:center;">2/23</td><td>ニコれんからアサヒ</td><td class="amount minus">−7,810</td></tr>
+      <tr><td></td><td style="text-align:center;">2/23</td><td>朝日東住吉今川の見積依頼</td><td class="amount minus">−2,200</td></tr>
+      <tr><td></td><td style="text-align:center;">2/23</td><td>ニコレンガソリン</td><td class="amount minus">−523</td></tr>
+      <tr><td></td><td style="text-align:center;">2/23</td><td>パラか駐車場</td><td class="amount minus">−400</td></tr>
+      <tr><td></td><td style="text-align:center;">2/24</td><td>えすみ</td><td class="amount minus">−11,390</td></tr>
+      <tr><td></td><td style="text-align:center;">2/28</td><td>SUBARUから</td><td class="amount minus">−10,000</td></tr>
+      <tr><td colspan="4" style="height:8px;"></td></tr>
+      <tr><td class="section-title" colspan="4">ゆうちょ事故対応クレカ袋</td></tr>
+      <tr><td></td><td style="text-align:center;">2/28</td><td>SUBARUから</td><td class="amount minus">−7,000</td></tr>
+      <tr><td colspan="4" style="height:8px;"></td></tr>
+      <tr><td class="section-title" colspan="4">L関西</td></tr>
+      <tr><td></td><td style="text-align:center;">3/15</td><td>郵貯事故対応クレカから</td><td class="amount minus">−7,000</td></tr>
+      <tr><td></td><td style="text-align:center;">4/10</td><td>楽天カーシェア 2/22 クレカ引き落とし</td><td class="amount minus">−3,640</td></tr>
+      <tr><td></td><td style="text-align:center;">4/12</td><td>7,000−3,640 の残金は未分類袋へ 3,360</td><td class="amount" style="color:#888;">—</td></tr>
+      <tr><td colspan="4" style="height:8px;"></td></tr>
+      <tr><td class="section-title" colspan="4">現金入金事故保険</td></tr>
+      <tr><td></td><td style="text-align:center;">3/15</td><td>ニコレンきた</td><td class="amount minus">−5,060</td></tr>
+      <tr><td></td><td style="text-align:center;">3/15</td><td>ローソン チャイラテなど</td><td class="amount minus">−293</td></tr>
+      <tr><td></td><td style="text-align:center;">3/15</td><td>麦茶・綾鷹</td><td class="amount minus">−287</td></tr>
+      <tr><td></td><td style="text-align:center;">3/15</td><td>ガソリン（ニコれん北辺り）</td><td class="amount minus">−1,490</td></tr>
+      <tr><td></td><td style="text-align:center;">3/18</td><td>事故保険</td><td class="amount plus">+115,000</td></tr>
+      <tr><td></td><td style="text-align:center;">3/20</td><td>自転車</td><td class="amount minus">−79,410</td></tr>
+      <tr><td></td><td style="text-align:center;">3/20</td><td>ニコレン</td><td class="amount minus">−13,640</td></tr>
+      <tr><td></td><td style="text-align:center;">3/20</td><td>バス代</td><td class="amount minus">−420</td></tr>
+      <tr><td></td><td style="text-align:center;">3/20</td><td>ガソリン</td><td class="amount minus">−1,931</td></tr>
+      <tr><td></td><td style="text-align:center;">3/20</td><td>阪神高速</td><td class="amount minus">−1,950</td></tr>
+      <tr><td></td><td style="text-align:center;">3/20</td><td>駐車場（隣マンション）</td><td class="amount minus">−200</td></tr>
+      <tr><td></td><td style="text-align:center;">3/20</td><td>朝駐車場（パラか）</td><td class="amount minus">−600</td></tr>
+      <tr><td></td><td style="text-align:center;">3/27</td><td>えすみ情報提供同意書書留</td><td class="amount minus">−350</td></tr>
+      <tr><td></td><td style="text-align:center;">3/29</td><td>サイクルメイト 3,300 ＋ 防犯登録 800</td><td class="amount minus">−4,430</td></tr>
+      <tr><td></td><td style="text-align:center;">3/29</td><td>朝日サイクル 市バス</td><td class="amount minus">−630</td></tr>
+      <tr><td></td><td style="text-align:center;">4/22</td><td>示談書最終送付書留</td><td class="amount minus">−350</td></tr>
+      <tr><td colspan="4" style="height:8px;"></td></tr>
+      <tr><td class="section-title" colspan="4">関西みらい</td></tr>
+      <tr><td></td><td style="text-align:center;">3/18</td><td>三井住友</td><td class="amount plus">+75,600</td></tr>
+      <tr><td></td><td style="text-align:center;">3/18</td><td>三井住友</td><td class="amount plus">+39,843</td></tr>
+      <tr><td></td><td style="text-align:center;">4/12</td><td>調整</td><td class="amount minus">−94,546</td></tr>
+      <tr><td></td><td style="text-align:center;">4/27</td><td>三井住友</td><td class="amount plus">+8,600</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── タブ3：証跡突合 ── -->
+<div id="tab3" class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th style="text-align:left;">内容</th>
+        <th>金額</th>
+        <th>項番</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 82,240円</td><td style="text-align:center;">①</td></tr>
+      <tr><td style="text-align:center;">2/23</td><td>朝日東住吉今川の見積依頼</td><td class="amount">2,200</td><td style="text-align:center;"><span class="badge">①</span></td></tr>
+      <tr><td style="text-align:center;">3/20</td><td>自転車</td><td class="amount">79,410</td><td style="text-align:center;"><span class="badge">①</span></td></tr>
+      <tr><td style="text-align:center;">3/29</td><td>朝日サイクル 市バス</td><td class="amount">630</td><td style="text-align:center;"><span class="badge">①</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 4,430円</td><td style="text-align:center;">②</td></tr>
+      <tr><td style="text-align:center;">3/29</td><td>サイクルメイト 3,300 ＋ 防犯登録 800</td><td class="amount">4,430</td><td style="text-align:center;"><span class="badge">②</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 3,640円</td><td style="text-align:center;">③</td></tr>
+      <tr><td style="text-align:center;">2/22</td><td>4/10 クレジット</td><td class="amount">0</td><td style="text-align:center;"><span class="badge">③</span></td></tr>
+      <tr><td style="text-align:center;">4/10</td><td>楽天カーシェア 2/22 クレカ引き落とし</td><td class="amount">3,640</td><td style="text-align:center;"><span class="badge">③</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 7,810円</td><td style="text-align:center;">④</td></tr>
+      <tr><td style="text-align:center;">2/23</td><td>ニコれんからアサヒ</td><td class="amount">7,810</td><td style="text-align:center;"><span class="badge">④</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 923円</td><td style="text-align:center;">⑤</td></tr>
+      <tr><td style="text-align:center;">2/23</td><td>ニコレンガソリン</td><td class="amount">523</td><td style="text-align:center;"><span class="badge">⑤</span></td></tr>
+      <tr><td style="text-align:center;">2/23</td><td>パラか駐車場</td><td class="amount">400</td><td style="text-align:center;"><span class="badge">⑤</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 11,390円</td><td style="text-align:center;">⑥</td></tr>
+      <tr><td style="text-align:center;">2/24</td><td>えすみ</td><td class="amount">11,390</td><td style="text-align:center;"><span class="badge">⑥</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 0円</td><td style="text-align:center;">⑦</td></tr>
+      <tr><td style="text-align:center;">2/24</td><td>えすみ診断書</td><td class="amount">0</td><td style="text-align:center;"><span class="badge">⑦</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 480円</td><td style="text-align:center;">⑧</td></tr>
+      <tr><td style="text-align:center;">3/04</td><td>朝日見積もり店舗受け取り往復電車賃</td><td class="amount">480</td><td style="text-align:center;"><span class="badge">⑧</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 18,741円</td><td style="text-align:center;">⑨</td></tr>
+      <tr><td style="text-align:center;">3/20</td><td>ニコレン</td><td class="amount">13,640</td><td style="text-align:center;"><span class="badge">⑨</span></td></tr>
+      <tr><td style="text-align:center;">3/20</td><td>バス代</td><td class="amount">420</td><td style="text-align:center;"><span class="badge">⑨</span></td></tr>
+      <tr><td style="text-align:center;">3/20</td><td>ガソリン</td><td class="amount">1,931</td><td style="text-align:center;"><span class="badge">⑨</span></td></tr>
+      <tr><td style="text-align:center;">3/20</td><td>阪神高速</td><td class="amount">1,950</td><td style="text-align:center;"><span class="badge">⑨</span></td></tr>
+      <tr><td style="text-align:center;">3/20</td><td>駐車場（隣マンション）</td><td class="amount">200</td><td style="text-align:center;"><span class="badge">⑨</span></td></tr>
+      <tr><td style="text-align:center;">3/20</td><td>朝駐車場（パラか）</td><td class="amount">600</td><td style="text-align:center;"><span class="badge">⑨</span></td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 700円</td><td style="text-align:center;">⭐︎</td></tr>
+      <tr><td style="text-align:center;">3/27</td><td>えすみ情報提供同意書書留</td><td class="amount">350</td><td style="text-align:center;">⭐︎</td></tr>
+      <tr><td style="text-align:center;">4/22</td><td>示談書最終送付書留</td><td class="amount">350</td><td style="text-align:center;">⭐︎</td></tr>
+      <tr class="ref-group-header"><td colspan="3" style="font-weight:700;">小計 7,130円</td><td style="text-align:center;">⭐︎</td></tr>
+      <tr><td style="text-align:center;">3/15</td><td>ニコレンきた</td><td class="amount">5,060</td><td style="text-align:center;">⭐︎</td></tr>
+      <tr><td style="text-align:center;">3/15</td><td>ローソン チャイラテなど</td><td class="amount">293</td><td style="text-align:center;">⭐︎</td></tr>
+      <tr><td style="text-align:center;">3/15</td><td>麦茶・綾鷹</td><td class="amount">287</td><td style="text-align:center;">⭐︎</td></tr>
+      <tr><td style="text-align:center;">3/15</td><td>ガソリン（ニコれん北辺り）</td><td class="amount">1,490</td><td style="text-align:center;">⭐︎</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Google OAuth（絶対にコミットしない）
+credentials.json
+token.json
+
+# 環境変数（APIキーを含む）
+.env
+
+# Python
+__pycache__/
+*.pyc
+.DS_Store

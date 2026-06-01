@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>トナーカートリッジ 購入ガイドバナー — Frame 15</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+
+  <!--
+    Figmaファイル : 無題 (g1tLQnoJjtbvnAD05rPS4p)
+    フレームID    : 2:2 "Frame 15"  680 × 74 px
+    最終更新      : 2026-05-21T05:14:30Z
+
+    読み込んだリソース:
+      [1] GET /v1/files/{fileId}?depth=10           … ノードツリー・座標・カラー・テキストスタイル
+      [2] GET /v1/files/{fileId}/nodes?ids=2:2      … 全ノード詳細（fill・stroke・cornerRadius）
+      [3] GET /v1/images/{fileId}?ids=...&scale=2   … 画像 13枚（2x PNG）
+
+    画像ノード一覧:
+      2:3  装飾アイコン (mono04726672)
+      2:4  装飾アイコン (mono84396752)
+      2:5  装飾アイコン (mono32987297)
+      2:6  装飾アイコン (mono84396752)
+      2:7  装飾アイコン (mono04726672)
+      2:8  装飾アイコン (mono04726672)
+      2:9  装飾アイコン (mono84396752)
+      2:10 装飾アイコン (mono32987297)
+      2:11 装飾アイコン (mono32987297)
+      2:12 back 1（左セクション背景, opacity:0.9）
+      2:17 商品アイコン
+      2:28 商品アイコン
+      2:35 スクリーンショット（右セクション写真）
+  -->
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #ccc;
+      padding: 40px;
+      font-family: "Noto Sans JP", sans-serif;
+    }
+
+    /* ── バナー全体 680×74px ── */
+    .banner {
+      position: relative;
+      width: 680px;
+      height: 74px;
+      overflow: hidden;
+      background: #fff;
+      /* stroke: SOLID 2px INSIDE — rgb(0.329,0.416,0.784) → #546ac8 */
+      box-shadow: inset 0 0 0 2px rgb(84, 106, 200);
+    }
+
+    /* ── [2:12] 左セクション背景画像 ── */
+    .bg {
+      position: absolute;
+      left: 0; top: -47px;
+      width: 512px; height: 170px;
+      object-fit: cover;
+      opacity: 0.9;
+      z-index: 1;
+    }
+
+    /* ── [2:3〜2:11] 装飾アイコン群（最背面） ── */
+    .deco-icons {
+      list-style: none;
+    }
+    .deco-icons li {
+      position: absolute;
+      z-index: 2;
+    }
+    .deco-icons img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: contain;
+    }
+
+    /* ── [2:13] 右セクション ダークオーバーレイ 168×74 ── */
+    .overlay {
+      position: absolute;
+      left: 512px; top: 0;
+      width: 168px; height: 74px;
+      background: rgba(0, 0, 0, 0.58);
+      z-index: 3;
+    }
+
+    /* ── [2:15] 購入ガイド（上段）/ [2:14] GUIDE（下段） ── */
+    .guide-label {
+      position: absolute;
+      left: 13px; top: 10px;
+      z-index: 4;
+    }
+    .guide-label__sub {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2e3f89;
+      line-height: 19.2px;
+      letter-spacing: 1.6px;
+    }
+    .guide-label__main {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2e3f89;
+      line-height: 33.6px;
+      letter-spacing: 0;
+    }
+
+    /* ── [2:28] 商品アイコン1 / [2:17] 商品アイコン2 ── */
+    .product-icon-1 {
+      position: absolute;
+      left: 107px; top: 26px;
+      width: 55px; height: 59px;
+      object-fit: contain;
+      z-index: 4;
+    }
+    .product-icon-2 {
+      position: absolute;
+      left: 138px; top: 1px;
+      width: 59px; height: 56px;
+      object-fit: contain;
+      z-index: 4;
+    }
+
+    /* ── [2:18] 縦区切り線 ── */
+    .divider-v {
+      position: absolute;
+      left: 208px; top: 18px;
+      width: 1px; height: 39px;
+      background: rgba(46, 63, 137, 0.4);
+      z-index: 4;
+    }
+
+    /* ── [2:22] トナーカートリッジ（メイン見出し） ── */
+    .main-heading {
+      position: absolute;
+      left: 221px; top: 7px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #2e3f89;
+      line-height: 33.6px;
+      letter-spacing: 0;
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    /*
+      ── [2:23] Frame 5：サブテキスト背景 ──
+      位置: x=224 y=43, サイズ: 267×21px
+      fill: GRADIENT_LINEAR 左→右
+        left  : rgb(85,107,202) = #556bca
+        right : rgb(46,63,137)  = #2e3f89
+      cornerRadius: 24px
+    */
+    .sub-frame {
+      position: absolute;
+      left: 224px; top: 43px;
+      width: 267px; height: 21px;
+      border-radius: 24px;
+      background: linear-gradient(to right, #556bca 0%, #2e3f89 100%);
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      z-index: 5;
+    }
+
+    /* ── [2:24] 新品・リサイクル〜テキスト ── */
+    .sub-frame__text {
+      font-size: 14px;
+      font-weight: 400;
+      color: #fff;
+      line-height: 16.8px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    /* ── [2:19] 取扱増量中！バッジ ── */
+    .badge {
+      position: absolute;
+      left: 556px; top: 13px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 16.8px;
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    /* ── [2:25] CTAグループ ── */
+    .cta {
+      position: absolute;
+      left: 521px; top: 39px;
+      width: 151px; height: 25px;
+      text-decoration: none;
+      z-index: 5;
+    }
+    /* [2:26] テキスト */
+    .cta__text {
+      position: absolute;
+      left: 0; top: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 21.6px;
+      white-space: nowrap;
+    }
+    /* [2:27] Ellipse: fills=none, stroke=white 1px, 25×25 at x:647 */
+    .cta__circle {
+      position: absolute;
+      left: 126px; top: 0;
+      width: 25px; height: 25px;
+      border-radius: 50%;
+      border: 1px solid #fff;
+      background: none;
+    }
+
+    /* ── [2:30][2:31] 左ボーダー装飾 ── */
+    .accent-left {
+      position: absolute;
+      left: 0; top: 0;
+      width: 4px; height: 74px;
+      z-index: 6;
+    }
+    .accent-left::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 37px;
+      background: rgb(243, 52, 224); /* #f334e0 */
+    }
+    .accent-left::after {
+      content: '';
+      position: absolute;
+      top: 37px; left: 0;
+      width: 4px; height: 37px;
+      background: rgb(112, 135, 235); /* #7087eb */
+    }
+
+    /* ── [2:33][2:34] 右ボーダー装飾 ── */
+    .accent-right {
+      position: absolute;
+      left: 676px; top: 0;
+      width: 4px; height: 74px;
+      z-index: 6;
+    }
+    .accent-right::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 37px;
+      background: rgb(255, 204, 0); /* #ffcc00 — 2:33 */
+    }
+    .accent-right::after {
+      content: '';
+      position: absolute;
+      top: 37px; left: 0;
+      width: 4px; height: 37px;
+      background: rgb(46, 63, 137); /* #2e3f89 — 2:34 */
+    }
+
+    /* ── [2:35] 右セクション写真（最前面） ── */
+    .screenshot {
+      position: absolute;
+      left: 510px; top: 0;
+      width: 166px; height: 74px;
+      margin: 0;
+      z-index: 10;
+    }
+    .screenshot img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+<section class="banner" aria-label="トナーカートリッジ 購入ガイドバナー">
+
+  <!-- [2:12] 左セクション背景画像（2x） -->
+  <img class="bg" src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/8ff5e4ee-5067-4c01-a032-f8c12b66a72c" alt="" aria-hidden="true">
+
+  <!-- [2:3〜2:11] 装飾アイコン群（2x・背面デコ） -->
+  <ul class="deco-icons" aria-hidden="true">
+    <li style="left:547px; top:-18px; width:46px; height:47px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/ad8a9dd4-fbd1-479b-84c9-f2ae5b068d3d" alt=""></li>
+    <li style="left:505px; top:6px;  width:52px; height:51px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/9489a116-eeb7-4866-b92f-fcd970edd20c" alt=""></li>
+    <li style="left:589px; top:-39px;width:42px; height:42px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/704d9d36-de13-4516-b526-5d0a5f499d2f" alt=""></li>
+    <li style="left:556px; top:75px; width:52px; height:52px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cf026033-f6bc-4d54-85c8-1beea05df474" alt=""></li>
+    <li style="left:569px; top:22px; width:46px; height:47px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/40c5eaed-acc8-4790-b162-9c014275ef6f" alt=""></li>
+    <li style="left:598px; top:55px; width:47px; height:48px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/be1fc19a-4917-4053-a771-37d0b381e812" alt=""></li>
+    <li style="left:527px; top:45px; width:52px; height:51px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/3871ee79-742f-4fc9-9011-d23bc4da0241" alt=""></li>
+    <li style="left:611px; top:1px;  width:42px; height:42px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/6c21ebb0-dd82-4b57-bdae-17f7efa8b012" alt=""></li>
+    <li style="left:639px; top:34px; width:42px; height:42px;"><img src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/c6823cc4-f601-4903-8df9-6822004a956f" alt=""></li>
+  </ul>
+
+  <!-- [2:13] 右セクション ダークオーバーレイ -->
+  <div class="overlay" aria-hidden="true"></div>
+
+  <!-- [2:15][2:14] 購入ガイドラベル -->
+  <header class="guide-label">
+    <p class="guide-label__sub">購入ガイド</p>
+    <p class="guide-label__main" aria-hidden="true">GUIDE</p>
+  </header>
+
+  <!-- [2:28][2:17] 商品アイコン（2x） -->
+  <img class="product-icon-1" src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/e5a4fab7-4000-403c-b261-e51ccc7af1c2" alt="トナーカートリッジアイコン">
+  <img class="product-icon-2" src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/1de8388b-f51b-4efb-8165-1cf3d82f69c0" alt="" aria-hidden="true">
+
+  <!-- [2:18] 縦区切り線 -->
+  <div class="divider-v" aria-hidden="true"></div>
+
+  <!-- [2:22] メイン見出し -->
+  <h2 class="main-heading">トナーカートリッジ</h2>
+
+  <!-- [2:23] Frame 5：グラデーション背景ピル + [2:24] サブテキスト -->
+  <div class="sub-frame">
+    <p class="sub-frame__text">新品・リサイクル・環境推進トナーも！</p>
+  </div>
+
+  <!-- [2:19] 取扱増量中バッジ -->
+  <p class="badge">取扱増量中！</p>
+
+  <!-- [2:25] CTAグループ -->
+  <a class="cta" href="#">
+    <span class="cta__text">詳しくはこちら &nbsp;&gt;</span>
+    <span class="cta__circle" aria-hidden="true"></span>
+  </a>
+
+  <!-- [2:30][2:31] 左ボーダー装飾 -->
+  <div class="accent-left" aria-hidden="true"></div>
+
+  <!-- [2:33][2:34] 右ボーダー装飾 -->
+  <div class="accent-right" aria-hidden="true"></div>
+
+  <!-- [2:35] 右セクション写真（最前面・2x） -->
+  <figure class="screenshot">
+    <img
+      src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/c9aa4e92-51fa-48ca-973b-83914c26b78f"
+      alt="スクリーンショット 2026-03-29 19.13.54 1"
+      width="166" height="74"
+    >
+  </figure>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI パターン比較</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f1f5f9; color: #1e293b; padding: 32px; }
+
+    h1 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 40px; }
+
+    .pattern { margin-bottom: 48px; }
+    .pattern-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .pattern-num { width: 32px; height: 32px; border-radius: 50%; background: #1e293b; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .pattern-title { font-size: 17px; font-weight: 700; }
+    .pattern-desc { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); overflow: hidden; }
+
+    /* 共通バッジ */
+    .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .badge-active   { background: #dcfce7; color: #15803d; }
+    .badge-upcoming { background: #dbeafe; color: #1d4ed8; }
+    .badge-ending   { background: #fef9c3; color: #a16207; }
+
+    /* 共通ボタン */
+    .btn { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 400; border: none; cursor: pointer; background: #f1f5f9; color: #475569; white-space: nowrap; }
+    .btn:hover { background: #e2e8f0; }
+    .btns { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    /* ─── パターン1: Rowspan ─── */
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: #f8fafc; padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid #e2e8f0; }
+    tbody td { padding: 10px 16px; border-bottom: 1px solid #f8fafc; font-size: 13px; color: #334155; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #f8fafc; }
+    .group-top td { border-top: 2px solid #e8ecf0; }
+    td.title-cell { vertical-align: top; padding-top: 12px; font-weight: 600; color: #1e293b; }
+    .banner-tag { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: #e2e8f0; color: #475569; font-size: 10px; font-weight: 700; }
+    .period { font-size: 12px; white-space: nowrap; }
+    .period-sub { color: #94a3b8; }
+
+    /* ─── パターン2: Accordion ─── */
+    .acc-row { border-bottom: 1px solid #f1f5f9; }
+    .acc-row:last-child { border-bottom: none; }
+    .acc-header {
+      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+      cursor: pointer; transition: background .12s; user-select: none;
+    }
+    .acc-header:hover { background: #f8fafc; }
+    .acc-arrow { font-size: 12px; color: #94a3b8; transition: transform .2s; flex-shrink: 0; }
+    .acc-row.open .acc-arrow { transform: rotate(90deg); }
+    .acc-title { font-size: 13px; font-weight: 600; flex: 1; }
+    .acc-meta { font-size: 11px; color: #94a3b8; }
+    .acc-body { display: none; border-top: 1px solid #f1f5f9; }
+    .acc-row.open .acc-body { display: block; }
+    .acc-banner { display: flex; align-items: center; gap: 12px; padding: 10px 20px 10px 44px; border-bottom: 1px solid #f8fafc; font-size: 12px; color: #475569; }
+    .acc-banner:last-child { border-bottom: none; }
+    .acc-banner:hover { background: #f8fafc; }
+    .acc-bid { font-weight: 700; color: #1e293b; min-width: 24px; }
+    .acc-file { flex: 1; color: #64748b; }
+    .acc-period { white-space: nowrap; color: #94a3b8; min-width: 130px; }
+
+    /* ─── パターン3: Matrix ─── */
+    .mx-table { width: 100%; border-collapse: collapse; }
+    .mx-table th { background: #f8fafc; padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+    .mx-table th.banner-col { background: #f0f4ff; color: #3b82f6; text-align: center; }
+    .mx-table td { padding: 12px 16px; border-bottom: 1px solid #f8fafc; font-size: 12px; color: #334155; vertical-align: top; }
+    .mx-table tr:last-child td { border-bottom: none; }
+    .mx-table td.banner-cell { background: #fafbff; text-align: left; border-left: 1px solid #e8ecf0; min-width: 160px; }
+    .mx-table td.banner-cell.empty { background: #f8fafc; color: #cbd5e1; text-align: center; font-size: 11px; }
+    .mx-cell-id { font-weight: 700; color: #1e293b; font-size: 12px; }
+    .mx-cell-period { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .mx-cell-file { font-size: 11px; color: #64748b; margin-top: 4px; }
+    .mx-cell-btns { margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+<h1>UI パターン比較</h1>
+<p class="subtitle">同じデータ（ファッションセール夏・旅行レジャー特集）を3パターンで表示</p>
+
+<!-- ─────────────────────────────────────────── -->
+<!-- パターン 1: Rowspan                         -->
+<!-- ─────────────────────────────────────────── -->
+<div class="pattern">
+  <div class="pattern-header">
+    <div class="pattern-num">1</div>
+    <div>
+      <div class="pattern-title">Rowspan（セル結合）</div>
+      <div class="pattern-desc">案件タイトルを縦結合。現在のdashboard.htmlと同じ方式。</div>
+    </div>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr>
+        <th>案件タイトル</th><th>ID</th><th>区分</th>
+        <th>掲載期間</th><th>ファイル名</th><th>リンク</th><th>ステータス</th>
+      </tr></thead>
+      <tbody>
+        <!-- ファッションセール夏 (3バナー) -->
+        <tr class="group-top">
+          <td class="title-cell" rowspan="3">ファッションセール夏</td>
+          <td><strong>70</strong></td><td><span class="banner-tag">A</span></td>
+          <td class="period">2026/06/01<br><span class="period-sub">〜 2026/08/31</span></td>
+          <td style="color:#64748b;font-size:12px">fashion-A.png</td>
+          <td><div class="btns"><button class="btn">保存先</button><button class="btn">提出先</button></div></td>
+          <td><span class="badge badge-upcoming">掲載予定</span></td>
+        </tr>
+        <tr>
+          <td><strong>70</strong></td><td><span class="banner-tag">B</span></td>
+          <td class="period">2026/06/01<br><span class="period-sub">〜 2026/08/31</span></td>
+          <td style="color:#64748b;font-size:12px">fashion-B.png</td>
+          <td><div class="btns"><button class="btn">保存先</button></div></td>
+          <td><span class="badge badge-upcoming">掲載予定</span></td>
+        </tr>
+        <tr>
+          <td><strong>71</strong></td><td><span class="banner-tag">C</span></td>
+          <td class="period">2026/07/01<br><span class="period-sub">〜 2026/09/30</span></td>
+          <td style="color:#64748b;font-size:12px">fashion-C.png</td>
+          <td><div class="btns"><button class="btn">保存先</button><button class="btn">WordPress</button></div></td>
+          <td><span class="badge badge-upcoming">掲載予定</span></td>
+        </tr>
+        <!-- 旅行レジャー特集 (2バナー) -->
+        <tr class="group-top">
+          <td class="title-cell" rowspan="2">旅行・レジャー特集</td>
+          <td><strong>72</strong></td><td><span class="banner-tag">A</span></td>
+          <td class="period">2026/06/15<br><span class="period-sub">〜 2026/09/15</span></td>
+          <td style="color:#64748b;font-size:12px">travel-A.png</td>
+          <td><div class="btns"><button class="btn">保存先</button><button class="btn">提出先</button></div></td>
+          <td><span class="badge badge-upcoming">掲載予定</span></td>
+        </tr>
+        <tr>
+          <td><strong>73</strong></td><td><span class="banner-tag">B</span></td>
+          <td class="period">2026/08/01<br><span class="period-sub">〜 2026/10/31</span></td>
+          <td style="color:#64748b;font-size:12px">travel-B.png</td>
+          <td><div class="btns"><button class="btn">保存先</button><button class="btn">WordPress</button></div></td>
+          <td><span class="badge badge-upcoming">掲載予定</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<!-- パターン 2: Accordion                       -->
+<!-- ─────────────────────────────────────────── -->
+<div class="pattern">
+  <div class="pattern-header">
+    <div class="pattern-num">2</div>
+    <div>
+      <div class="pattern-title">Accordion（折りたたみ）</div>
+      <div class="pattern-desc">案件タイトルをクリックでバナーを展開。バナー数が違っても崩れない。</div>
+    </div>
+  </div>
+  <div class="card">
+    <!-- ファッションセール夏 -->
+    <div class="acc-row open" id="acc1">
+      <div class="acc-header" onclick="toggleAcc('acc1')">
+        <span class="acc-arrow">▶</span>
+        <span class="acc-title">ファッションセール夏</span>
+        <span class="acc-meta">バナー 3件</span>
+        <span class="badge badge-upcoming">掲載予定</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-banner">
+          <span class="banner-tag">A</span>
+          <span class="acc-bid">70</span>
+          <span class="acc-period">2026/06/01 〜 08/31</span>
+          <span class="acc-file">fashion-A.png</span>
+          <div class="btns"><button class="btn">保存先</button><button class="btn">提出先</button></div>
+        </div>
+        <div class="acc-banner">
+          <span class="banner-tag">B</span>
+          <span class="acc-bid">70</span>
+          <span class="acc-period">2026/06/01 〜 08/31</span>
+          <span class="acc-file">fashion-B.png</span>
+          <div class="btns"><button class="btn">保存先</button></div>
+        </div>
+        <div class="acc-banner">
+          <span class="banner-tag">C</span>
+          <span class="acc-bid">71</span>
+          <span class="acc-period">2026/07/01 〜 09/30</span>
+          <span class="acc-file">fashion-C.png</span>
+          <div class="btns"><button class="btn">保存先</button><button class="btn">WordPress</button></div>
+        </div>
+      </div>
+    </div>
+    <!-- 旅行レジャー特集 -->
+    <div class="acc-row" id="acc2">
+      <div class="acc-header" onclick="toggleAcc('acc2')">
+        <span class="acc-arrow">▶</span>
+        <span class="acc-title">旅行・レジャー特集</span>
+        <span class="acc-meta">バナー 2件</span>
+        <span class="badge badge-upcoming">掲載予定</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-banner">
+          <span class="banner-tag">A</span>
+          <span class="acc-bid">72</span>
+          <span class="acc-period">2026/06/15 〜 09/15</span>
+          <span class="acc-file">travel-A.png</span>
+          <div class="btns"><button class="btn">保存先</button><button class="btn">提出先</button></div>
+        </div>
+        <div class="acc-banner">
+          <span class="banner-tag">B</span>
+          <span class="acc-bid">73</span>
+          <span class="acc-period">2026/08/01 〜 10/31</span>
+          <span class="acc-file">travel-B.png</span>
+          <div class="btns"><button class="btn">保存先</button><button class="btn">WordPress</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<!-- パターン 3: Matrix                          -->
+<!-- ─────────────────────────────────────────── -->
+<div class="pattern">
+  <div class="pattern-header">
+    <div class="pattern-num">3</div>
+    <div>
+      <div class="pattern-title">Matrix（バナーを横並び）</div>
+      <div class="pattern-desc">バナーA/B/Cを列にして横断比較しやすい。バナー数が揃っている時に有効。</div>
+    </div>
+  </div>
+  <div class="card">
+    <table class="mx-table">
+      <thead><tr>
+        <th>案件タイトル</th>
+        <th>ステータス</th>
+        <th class="banner-col">バナー A</th>
+        <th class="banner-col">バナー B</th>
+        <th class="banner-col">バナー C</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600">ファッションセール夏</td>
+          <td><span class="badge badge-upcoming">掲載予定</span></td>
+          <td class="banner-cell">
+            <div class="mx-cell-id">ID: 70</div>
+            <div class="mx-cell-period">2026/06/01 〜 08/31</div>
+            <div class="mx-cell-file">fashion-A.png</div>
+            <div class="mx-cell-btns"><div class="btns"><button class="btn">保存先</button><button class="btn">提出先</button></div></div>
+          </td>
+          <td class="banner-cell">
+            <div class="mx-cell-id">ID: 70</div>
+            <div class="mx-cell-period">2026/06/01 〜 08/31</div>
+            <div class="mx-cell-file">fashion-B.png</div>
+            <div class="mx-cell-btns"><div class="btns"><button class="btn">保存先</button></div></div>
+          </td>
+          <td class="banner-cell">
+            <div class="mx-cell-id">ID: 71</div>
+            <div class="mx-cell-period">2026/07/01 〜 09/30</div>
+            <div class="mx-cell-file">fashion-C.png</div>
+            <div class="mx-cell-btns"><div class="btns"><button class="btn">保存先</button><button class="btn">WordPress</button></div></div>
+          </td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">旅行・レジャー特集</td>
+          <td><span class="badge badge-upcoming">掲載予定</span></td>
+          <td class="banner-cell">
+            <div class="mx-cell-id">ID: 72</div>
+            <div class="mx-cell-period">2026/06/15 〜 09/15</div>
+            <div class="mx-cell-file">travel-A.png</div>
+            <div class="mx-cell-btns"><div class="btns"><button class="btn">保存先</button><button class="btn">提出先</button></div></div>
+          </td>
+          <td class="banner-cell">
+            <div class="mx-cell-id">ID: 73</div>
+            <div class="mx-cell-period">2026/08/01 〜 10/31</div>
+            <div class="mx-cell-file">travel-B.png</div>
+            <div class="mx-cell-btns"><div class="btns"><button class="btn">保存先</button><button class="btn">WordPress</button></div></div>
+          </td>
+          <td class="banner-cell empty">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function toggleAcc(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+</script>
+</body>
+</html>
